@@ -5,8 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 
-[Live Demo](#)  
-
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Textura-blue?style=for-the-badge)](https://f58igx-kodes.github.io/Textura/)
 
 
 ## Features ✨
