@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="x-icon" href="https://img.icons8.com/liquid-glass/100/multiline-text.png">
+    <title>ASCII Art Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            background: #0a0a0a;
+            color: white;
+            overflow-x: hidden;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        /* Theme Styles */
+        .theme-dark {
+            background: #0a0a0a;
+        }
+
+        .theme-matrix {
+            background: #000000;
+            background-image:
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 0, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(0, 255, 0, 0.03) 0%, transparent 50%);
+        }
+
+        .theme-cyberpunk {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a0033 50%, #0a0a0a 100%);
+            background-size: 400% 400%;
+            animation: cyberpunkShift 10s ease infinite;
+        }
+
+        .theme-ocean {
+    background: linear-gradient(135deg, #0a0b1a 0%, #05080f 50%, #030507 100%);
+        }
+
+        .theme-sunset {
+    background: linear-gradient(135deg, #0f051f 0%, #070509 50%, #050306 100%);
+        }
+
+        .theme-neon {
+            background: #0a0a0a;
+            background-image:
+                radial-gradient(circle at 25% 25%, rgba(255, 0, 150, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+        }
+
+        @keyframes cyberpunkShift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        /* Floating Gradient Blobs */
+        .blob-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .blob:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(100, 200, 255, 0.5), transparent);
+            top: 10%;
+            left: 15%;
+            animation-duration: 18s;
+        }
+
+        .blob:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 100, 200, 0.5), transparent);
+            top: 60%;
+            left: 70%;
+            animation-duration: 22s;
+            animation-delay: -5s;
+        }
+
+        .blob:nth-child(3) {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(200, 255, 100, 0.5), transparent);
+            top: 40%;
+            left: 30%;
+            animation-duration: 20s;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            25% {
+                transform: translate(100px, 50px) scale(1.1);
+            }
+
+            50% {
+                transform: translate(-50px, 100px) scale(0.9);
+            }
+
+            75% {
+                transform: translate(50px, -50px) scale(1.05);
+            }
+
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: slideDown 1s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #a0a0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.3rem;
+            font-weight: 300;
+            animation: fadeIn 1s ease-out 0.5s both;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            animation: slideUp 1s ease-out 0.8s both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: rotate(45deg) translateX(-100%);
+            }
+
+            100% {
+                transform: rotate(45deg) translateX(100%);
+            }
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                0 0 20px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .input-section h2,
+        .output-section h2 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .textarea {
+            width: 100%;
+            height: 350px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            color: white;
+            font-size: 1rem;
+            font-family: 'Monaco', 'Menlo', 'Fira Code', monospace;
+            resize: none;
+            outline: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .textarea:focus {
+            border-color: rgba(100, 200, 255, 0.5);
+            box-shadow:
+                0 0 20px rgba(100, 200, 255, 0.2),
+                inset 0 0 20px rgba(100, 200, 255, 0.05);
+            transform: scale(1.01);
+        }
+
+        .textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+            font-style: italic;
+        }
+
+        .ascii-output {
+            width: 100%;
+            height: 350px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            color: #00ff88;
+            font-family: 'Monaco', 'Menlo', 'Fira Code', monospace;
+            font-size: 0.8rem;
+            line-height: 1.2;
+            overflow: auto;
+            white-space: pre;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .ascii-char {
+            display: inline;
+            opacity: 0;
+        }
+
+        .ascii-char.visible {
+            opacity: 1;
+            transition: opacity 0.05s ease-in;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+            animation: slideUp 1s ease-out 1s both;
+        }
+
+        .control-group:last-child {
+            grid-column: 1 / -1;
+        }
+
+        .control-group {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .control-group:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .control-group h3 {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            padding: 1rem;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .select:focus,
+        .select:hover {
+            border-color: rgba(100, 200, 255, 0.5);
+            box-shadow: 0 0 15px rgba(100, 200, 255, 0.2);
+            transform: scale(1.02);
+        }
+
+        .select option {
+            background: rgba(20, 20, 30, 0.95);
+            color: white;
+            padding: 0.5rem;
+        }
+
+        .theme-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .theme-btn {
+            padding: 0.8rem 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.8rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .theme-btn:hover::before {
+            left: 100%;
+        }
+
+        .theme-btn:hover,
+        .theme-btn.active {
+            background: rgba(100, 200, 255, 0.2);
+            border-color: rgba(100, 200, 255, 0.4);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(100, 200, 255, 0.2);
+        }
+
+        .theme-btn.active {
+            background: rgba(100, 200, 255, 0.3);
+            box-shadow: 0 0 20px rgba(100, 200, 255, 0.4);
+        }
+
+        .slider-container {
+            position: relative;
+            margin-top: 1rem;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            outline: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #64c8ff, #4facfe);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(100, 200, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(100, 200, 255, 0.8);
+        }
+
+        .slider-value {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: slideUp 1s ease-out 1.2s both;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1.5rem;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(100, 200, 255, 0.3);
+            background: rgba(100, 200, 255, 0.2);
+            border-color: rgba(100, 200, 255, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .btn.success {
+            background: rgba(16, 185, 129, 0.3);
+            border-color: rgba(16, 185, 129, 0.5);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .color-picker-container {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .color-picker:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .title {
+                font-size: 2.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .theme-buttons {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .copy-success {
+            animation: copySuccess 2s ease-in-out;
+        }
+
+        @keyframes copySuccess {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.15) rotate(5deg);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .loading {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .theme-matrix .ascii-output {
+            color: #00ff41;
+            text-shadow: 0 0 10px #00ff41;
+        }
+
+        .theme-cyberpunk .ascii-output {
+            color: #ff0080;
+            text-shadow: 0 0 10px #ff0080;
+        }
+
+        .theme-ocean .ascii-output {
+            color: #00d4ff;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .theme-sunset .ascii-output {
+            color: #ff6b6b;
+            text-shadow: 0 0 10px #ff6b6b;
+        }
+
+        .theme-neon .ascii-output {
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+        }
+    </style>
+</head>
+
+<body class="theme-dark">
+    <div class="blob-container">
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="blob"></div>
+    </div>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Textura</h1>
+            <p class="subtitle">Transform your text into stunning ASCII masterpieces</p>
+        </div>
+
+        <div class="main-grid">
+            <div class="glass-card input-section">
+                <h2>✨ Input Text</h2>
+                <textarea class="textarea" id="inputText" placeholder="Type something epic..."></textarea>
+            </div>
+
+            <div class="glass-card output-section">
+                <h2>🎨 ASCII Art</h2>
+                <pre class="ascii-output" id="asciiOutput">Your ASCII art will appear here...</pre>
+            </div>
+        </div>
+
+        <div class="controls-grid">
+            <div class="control-group">
+                <h3>🎭 Font Style</h3>
+                <select class="select" id="fontSelect">
+                    <option value="block">Block Letters</option>
+                    <option value="bubble">Bubble Style</option>
+                    <option value="thin">Thin Lines</option>
+                    <option value="thick">Thick Bold</option>
+                    <option value="shadow">Shadow Effect</option>
+                    <option value="digital">Digital Display</option>
+                    <option value="graffiti">Graffiti Style</option>
+                    <option value="cursive">Cursive Flow</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <h3>🎨 Theme</h3>
+                <div class="theme-buttons">
+                    <div class="theme-btn active" data-theme="dark">🌙 Dark</div>
+                    <div class="theme-btn" data-theme="matrix">🔰 Matrix</div>
+                    <div class="theme-btn" data-theme="cyberpunk">⚡ Cyber</div>
+                    <div class="theme-btn" data-theme="ocean">🌊 Ocean</div>
+                    <div class="theme-btn" data-theme="sunset">🌅 Sunset</div>
+                    <div class="theme-btn" data-theme="neon">💎 Neon</div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>📏 Size Scale</h3>
+                <div class="slider-container">
+                    <input type="range" class="slider" id="sizeSlider" min="0.3" max="3" step="0.1" value="1">
+                    <div class="slider-value" id="sizeValue">1.0x</div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>🖼️ Export Options</h3>
+                <div class="color-picker-container">
+                    <label for="bgColorPicker">Background:</label>
+                    <input type="color" class="color-picker" id="bgColorPicker" value="#0a0a0a">
+                    <label for="textColorPicker">Text:</label>
+                    <input type="color" class="color-picker" id="textColorPicker" value="#00ff88">
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn" id="copyBtn">📋 Copy to Clipboard</button>
+            <button class="btn" id="downloadBtn">💾 Download TXT</button>
+            <button class="btn" id="exportImageBtn">🖼️ Export as PNG</button>
+            <button class="btn" id="clearBtn">🗑️ Clear All</button>
+            <button class="btn" id="randomBtn">🎲 Random Text</button>
+        </div>
+    </div>
+
+    <script>
+        // Extended ASCII font patterns
+        const fonts = {
+            block: {
+                'A': ['█████', '█   █', '█████', '█   █', '█   █'],
+                'B': ['████ ', '█   █', '████ ', '█   █', '████ '],
+                'C': ['█████', '█    ', '█    ', '█    ', '█████'],
+                'D': ['████ ', '█   █', '█   █', '█   █', '████ '],
+                'E': ['█████', '█    ', '███  ', '█    ', '█████'],
+                'F': ['█████', '█    ', '███  ', '█    ', '█    '],
+                'G': ['█████', '█    ', '█ ███', '█   █', '█████'],
+                'H': ['█   █', '█   █', '█████', '█   █', '█   █'],
+                'I': ['█████', '  █  ', '  █  ', '  █  ', '█████'],
+                'J': ['█████', '    █', '    █', '█   █', '█████'],
+                'K': ['█   █', '█  █ ', '███  ', '█  █ ', '█   █'],
+                'L': ['█    ', '█    ', '█    ', '█    ', '█████'],
+                'M': ['█   █', '██ ██', '█ █ █', '█   █', '█   █'],
+                'N': ['█   █', '██  █', '█ █ █', '█  ██', '█   █'],
+                'O': ['█████', '█   █', '█   █', '█   █', '█████'],
+                'P': ['████ ', '█   █', '████ ', '█    ', '█    '],
+                'Q': ['█████', '█   █', '█ █ █', '█  ██', '██ ██'],
+                'R': ['████ ', '█   █', '████ ', '█  █ ', '█   █'],
+                'S': ['█████', '█    ', '█████', '    █', '█████'],
+                'T': ['█████', '  █  ', '  █  ', '  █  ', '  █  '],
+                'U': ['█   █', '█   █', '█   █', '█   █', '█████'],
+                'V': ['█   █', '█   █', '█   █', ' █ █ ', '  █  '],
+                'W': ['█   █', '█   █', '█ █ █', '██ ██', '█   █'],
+                'X': ['█   █', ' █ █ ', '  █  ', ' █ █ ', '█   █'],
+                'Y': ['█   █', ' █ █ ', '  █  ', '  █  ', '  █  '],
+                'Z': ['█████', '   █ ', '  █  ', ' █   ', '█████'],
+                ' ': ['     ', '     ', '     ', '     ', '     ']
+            },
+            digital: {
+                'A': [' ### ', '#   #', '#####', '#   #', '#   #'],
+                'B': ['#### ', '#   #', '#### ', '#   #', '#### '],
+                'C': [' ### ', '#    ', '#    ', '#    ', ' ### '],
+                'D': ['#### ', '#   #', '#   #', '#   #', '#### '],
+                'E': ['#####', '#    ', '#### ', '#    ', '#####'],
+                'F': ['#####', '#    ', '#### ', '#    ', '#    '],
+                'G': [' ### ', '#    ', '#  ##', '#   #', ' ### '],
+                'H': ['#   #', '#   #', '#####', '#   #', '#   #'],
+                'I': ['#####', '  #  ', '  #  ', '  #  ', '#####'],
+                'J': ['#####', '    #', '    #', '#   #', ' ### '],
+                'K': ['#   #', '#  # ', '###  ', '#  # ', '#   #'],
+                'L': ['#    ', '#    ', '#    ', '#    ', '#####'],
+                'M': ['#   #', '## ##', '# # #', '#   #', '#   #'],
+                'N': ['#   #', '##  #', '# # #', '#  ##', '#   #'],
+                'O': [' ### ', '#   #', '#   #', '#   #', ' ### '],
+                'P': ['#### ', '#   #', '#### ', '#    ', '#    '],
+                'Q': [' ### ', '#   #', '#   #', '#  ##', ' ## #'],
+                'R': ['#### ', '#   #', '#### ', '#  # ', '#   #'],
+                'S': [' ### ', '#    ', ' ### ', '    #', ' ### '],
+                'T': ['#####', '  #  ', '  #  ', '  #  ', '  #  '],
+                'U': ['#   #', '#   #', '#   #', '#   #', ' ### '],
+                'V': ['#   #', '#   #', '#   #', ' # # ', '  #  '],
+                'W': ['#   #', '#   #', '# # #', '## ##', '#   #'],
+                'X': ['#   #', ' # # ', '  #  ', ' # # ', '#   #'],
+                'Y': ['#   #', ' # # ', '  #  ', '  #  ', '  #  '],
+                'Z': ['#####', '   # ', '  #  ', ' #   ', '#####'],
+                ' ': ['     ', '     ', '     ', '     ', '     ']
+            },
+            graffiti: {
+                'A': ['░▓██▓', '▓░  ▓', '▓▓▓▓▓', '▓   ▓', '▓   ▓'],
+                'B': ['▓▓▓▓░', '▓   ▓', '▓▓▓▓░', '▓   ▓', '▓▓▓▓░'],
+                'C': ['░▓▓▓▓', '▓░   ', '▓░   ', '▓░   ', '░▓▓▓▓'],
+                'D': ['▓▓▓▓░', '▓   ▓', '▓   ▓', '▓   ▓', '▓▓▓▓░'],
+                'E': ['▓▓▓▓▓', '▓░   ', '▓▓▓░ ', '▓░   ', '▓▓▓▓▓'],
+                'F': ['▓▓▓▓▓', '▓░   ', '▓▓▓░ ', '▓░   ', '▓░   '],
+                'G': ['░▓▓▓▓', '▓░   ', '▓░▓▓▓', '▓   ▓', '░▓▓▓▓'],
+                'H': ['▓   ▓', '▓   ▓', '▓▓▓▓▓', '▓   ▓', '▓   ▓'],
+                'I': ['▓▓▓▓▓', '  ▓  ', '  ▓  ', '  ▓  ', '▓▓▓▓▓'],
+                'J': ['▓▓▓▓▓', '    ▓', '    ▓', '▓   ▓', '░▓▓▓▓'],
+                'K': ['▓   ▓', '▓  ▓░', '▓▓▓  ', '▓  ▓░', '▓   ▓'],
+                'L': ['▓░   ', '▓░   ', '▓░   ', '▓░   ', '▓▓▓▓▓'],
+                'M': ['▓   ▓', '▓▓░▓▓', '▓░▓░▓', '▓   ▓', '▓   ▓'],
+                'N': ['▓   ▓', '▓▓  ▓', '▓░▓░▓', '▓  ▓▓', '▓   ▓'],
+                'O': ['░▓▓▓░', '▓   ▓', '▓   ▓', '▓   ▓', '░▓▓▓░'],
+                'P': ['▓▓▓▓░', '▓   ▓', '▓▓▓▓░', '▓░   ', '▓░   '],
+                'Q': ['░▓▓▓░', '▓   ▓', '▓░▓░▓', '▓  ▓▓', '░▓▓▓▓'],
+                'R': ['▓▓▓▓░', '▓   ▓', '▓▓▓▓░', '▓  ▓░', '▓   ▓'],
+                'S': ['░▓▓▓▓', '▓░   ', '░▓▓▓░', '    ▓', '▓▓▓▓░'],
+                'T': ['▓▓▓▓▓', '  ▓  ', '  ▓  ', '  ▓  ', '  ▓  '],
+                'U': ['▓   ▓', '▓   ▓', '▓   ▓', '▓   ▓', '░▓▓▓░'],
+                'V': ['▓   ▓', '▓   ▓', '▓   ▓', '░▓ ▓░', '  ▓  '],
+                'W': ['▓   ▓', '▓   ▓', '▓░▓░▓', '▓▓░▓▓', '▓   ▓'],
+                'X': ['▓   ▓', '░▓ ▓░', '  ▓  ', '░▓ ▓░', '▓   ▓'],
+                'Y': ['▓   ▓', '░▓ ▓░', '  ▓  ', '  ▓  ', '  ▓  '],
+                'Z': ['▓▓▓▓▓', '   ▓░', '  ▓  ', '░▓   ', '▓▓▓▓▓'],
+                ' ': ['     ', '     ', '     ', '     ', '     ']
+            },
+            cursive: {
+                'A': ['  ▄▄ ', ' █  █', ' ████', '█   █', '█   █'],
+                'B': ['███▄ ', '█   █', '███▄ ', '█   █', '███▄ '],
+                'C': [' ▄██▄', '█    ', '█    ', '█    ', ' ▄██▄'],
+                'D': ['███▄ ', '█   █', '█   █', '█   █', '███▄ '],
+                'E': ['█████', '█    ', '███▄ ', '█    ', '█████'],
+                'F': ['█████', '█    ', '███▄ ', '█    ', '█    '],
+                'G': [' ▄██▄', '█    ', '█ ▄██', '█   █', ' ▄██▄'],
+                'H': ['█   █', '█   █', '█████', '█   █', '█   █'],
+                'I': ['█████', '  █  ', '  █  ', '  █  ', '█████'],
+                'J': ['█████', '   █ ', '   █ ', '█  █ ', ' ██  '],
+                'K': ['█   █', '█  █ ', '███  ', '█  █ ', '█   █'],
+                'L': ['█    ', '█    ', '█    ', '█    ', '█████'],
+                'M': ['█▄ ▄█', '█▀█▀█', '█   █', '█   █', '█   █'],
+                'N': ['█▄  █', '█▀█ █', '█ ▀██', '█   █', '█   █'],
+                'O': [' ▄█▄ ', '█   █', '█   █', '█   █', ' ▄█▄ '],
+                'P': ['███▄ ', '█   █', '███▄ ', '█    ', '█    '],
+                'Q': [' ▄█▄ ', '█   █', '█ ▄ █', '█  ▀█', ' ▄█▀█'],
+                'R': ['███▄ ', '█   █', '███▄ ', '█ ▀  ', '█  ▀█'],
+                'S': [' ▄███', '█    ', ' ▄█▄ ', '    █', '███▄ '],
+                'T': ['█████', '  █  ', '  █  ', '  █  ', '  █  '],
+                'U': ['█   █', '█   █', '█   █', '█   █', ' ▄█▄ '],
+                'V': ['█   █', '█   █', '█   █', ' █ █ ', '  █  '],
+                'W': ['█   █', '█   █', '█   █', '█▀█▀█', '█▄ ▄█'],
+                'X': ['█   █', ' █ █ ', '  █  ', ' █ █ ', '█   █'],
+                'Y': ['█   █', ' █ █ ', '  █  ', '  █  ', '  █  '],
+                'Z': ['█████', '   █ ', '  █  ', ' █   ', '█████'],
+                ' ': ['     ', '     ', '     ', '     ', '     ']
+            },
+            bubble: {
+                'A': ['  ██  ', ' ████ ', '██  ██', '██████', '██  ██'],
+                'B': ['██████', '██  ██', '██████', '██  ██', '██████'],
+                'C': [' █████', '██    ', '██    ', '██    ', ' █████'],
+                'D': ['██████', '██  ██', '██  ██', '██  ██', '██████'],
+                'E': ['██████', '██    ', '██████', '██    ', '██████'],
+                'F': ['██████', '██    ', '██████', '██    ', '██    '],
+                'G': [' █████', '██    ', '██  ██', '██  ██', ' █████'],
+                'H': ['██  ██', '██  ██', '██████', '██  ██', '██  ██'],
+                'I': ['██████', '  ██  ', '  ██  ', '  ██  ', '██████'],
+                'J': ['██████', '    ██', '    ██', '██  ██', ' █████'],
+                'K': ['██  ██', '██ ██ ', '████  ', '██ ██ ', '██  ██'],
+                'L': ['██    ', '██    ', '██    ', '██    ', '██████'],
+                'M': ['██  ██', '██████', '██████', '██  ██', '██  ██'],
+                'N': ['███ ██', '██████', '██████', '██ ███', '██  ██'],
+                'O': [' █████', '██  ██', '██  ██', '██  ██', ' █████'],
+                'P': ['██████', '██  ██', '██████', '██    ', '██    '],
+                'Q': [' █████', '██  ██', '██ ███', '██ ███', ' ██████'],
+                'R': ['██████', '██  ██', '██████', '██ ██ ', '██  ██'],
+                'S': [' █████', '██    ', ' █████', '    ██', '█████ '],
+                'T': ['██████', '  ██  ', '  ██  ', '  ██  ', '  ██  '],
+                'U': ['██  ██', '██  ██', '██  ██', '██  ██', ' █████'],
+                'V': ['██  ██', '██  ██', '██  ██', ' ████ ', '  ██  '],
+                'W': ['██  ██', '██  ██', '██████', '██████', '██  ██'],
+                'X': ['██  ██', ' ████ ', '  ██  ', ' ████ ', '██  ██'],
+                'Y': ['██  ██', ' ████ ', '  ██  ', '  ██  ', '  ██  '],
+                'Z': ['██████', '   ██ ', '  ██  ', ' ██   ', '██████'],
+                ' ': ['      ', '      ', '      ', '      ', '      ']
+            },
+            thin: {
+                'A': [' █ ', '█ █', '███', '█ █', '█ █'],
+                'B': ['██ ', '█ █', '██ ', '█ █', '██ '],
+                'C': ['███', '█  ', '█  ', '█  ', '███'],
+                'D': ['██ ', '█ █', '█ █', '█ █', '██ '],
+                'E': ['███', '█  ', '██ ', '█  ', '███'],
+                'F': ['███', '█  ', '██ ', '█  ', '█  '],
+                'G': ['███', '█  ', '█ █', '█ █', '███'],
+                'H': ['█ █', '█ █', '███', '█ █', '█ █'],
+                'I': ['███', ' █ ', ' █ ', ' █ ', '███'],
+                'J': ['███', '  █', '  █', '█ █', '███'],
+                'K': ['█ █', '██ ', '█  ', '██ ', '█ █'],
+                'L': ['█  ', '█  ', '█  ', '█  ', '███'],
+                'M': ['█ █', '███', '█ █', '█ █', '█ █'],
+                'N': ['█ █', '███', '█ █', '█ █', '█ █'],
+                'O': ['███', '█ █', '█ █', '█ █', '███'],
+                'P': ['██ ', '█ █', '██ ', '█  ', '█  '],
+                'Q': ['███', '█ █', '█ █', '███', '  █'],
+                'R': ['██ ', '█ █', '██ ', '█ █', '█ █'],
+                'S': ['███', '█  ', '███', '  █', '███'],
+                'T': ['███', ' █ ', ' █ ', ' █ ', ' █ '],
+                'U': ['█ █', '█ █', '█ █', '█ █', '███'],
+                'V': ['█ █', '█ █', '█ █', '█ █', ' █ '],
+                'W': ['█ █', '█ █', '█ █', '███', '█ █'],
+                'X': ['█ █', '█ █', ' █ ', '█ █', '█ █'],
+                'Y': ['█ █', '█ █', ' █ ', ' █ ', ' █ '],
+                'Z': ['███', '  █', ' █ ', '█  ', '███'],
+                ' ': ['   ', '   ', '   ', '   ', '   ']
+            },
+            thick: {
+                'A': ['██████', '██  ██', '██████', '██  ██', '██  ██'],
+                'B': ['██████', '██  ██', '██████', '██  ██', '██████'],
+                'C': ['██████', '██    ', '██    ', '██    ', '██████'],
+                'D': ['██████', '██  ██', '██  ██', '██  ██', '██████'],
+                'E': ['██████', '██    ', '██████', '██    ', '██████'],
+                'F': ['██████', '██    ', '██████', '██    ', '██    '],
+                'G': ['██████', '██    ', '██ ███', '██  ██', '██████'],
+                'H': ['██  ██', '██  ██', '██████', '██  ██', '██  ██'],
+                'I': ['██████', '  ██  ', '  ██  ', '  ██  ', '██████'],
+                'J': ['██████', '    ██', '    ██', '██  ██', '██████'],
+                'K': ['██  ██', '██ ██ ', '████  ', '██ ██ ', '██  ██'],
+                'L': ['██    ', '██    ', '██    ', '██    ', '██████'],
+                'M': ['██  ██', '██████', '██████', '██  ██', '██  ██'],
+                'N': ['██  ██', '██████', '██████', '██████', '██  ██'],
+                'O': ['██████', '██  ██', '██  ██', '██  ██', '██████'],
+                'P': ['██████', '██  ██', '██████', '██    ', '██    '],
+                'Q': ['██████', '██  ██', '██ ███', '██ ███', '██████'],
+                'R': ['██████', '██  ██', '██████', '██ ██ ', '██  ██'],
+                'S': ['██████', '██    ', '██████', '    ██', '██████'],
+                'T': ['██████', '  ██  ', '  ██  ', '  ██  ', '  ██  '],
+                'U': ['██  ██', '██  ██', '██  ██', '██  ██', '██████'],
+                'V': ['██  ██', '██  ██', '██  ██', ' ████ ', '  ██  '],
+                'W': ['██  ██', '██  ██', '██████', '██████', '██  ██'],
+                'X': ['██  ██', ' ████ ', '  ██  ', ' ████ ', '██  ██'],
+                'Y': ['██  ██', ' ████ ', '  ██  ', '  ██  ', '  ██  '],
+                'Z': ['██████', '   ██ ', '  ██  ', ' ██   ', '██████'],
+                ' ': ['      ', '      ', '      ', '      ', '      ']
+            },
+            shadow: {
+                'A': ['  ██▄ ', ' █  █▄', ' ████▄', '█   █▄', '█   █▄'],
+                'B': ['███▄▄', '█  █▄', '███▄▄', '█  █▄', '███▄▄'],
+                'C': [' ███▄', '█   ▄', '█   ▄', '█   ▄', ' ███▄'],
+                'D': ['███▄▄', '█  █▄', '█  █▄', '█  █▄', '███▄▄'],
+                'E': ['████▄', '█   ▄', '███▄▄', '█   ▄', '████▄'],
+                'F': ['████▄', '█   ▄', '███▄▄', '█   ▄', '█   ▄'],
+                'G': [' ███▄', '█   ▄', '█ ██▄', '█  █▄', ' ███▄'],
+                'H': ['█  █▄', '█  █▄', '████▄', '█  █▄', '█  █▄'],
+                'I': ['████▄', ' █ ▄ ', ' █ ▄ ', ' █ ▄ ', '████▄'],
+                'J': ['████▄', '   █▄', '   █▄', '█ █▄▄', ' ██▄▄'],
+                'K': ['█  █▄', '█ █▄ ', '██▄  ', '█ █▄ ', '█  █▄'],
+                'L': ['█  ▄ ', '█  ▄ ', '█  ▄ ', '█  ▄ ', '████▄'],
+                'M': ['█▄█▄█', '█▄█▄█', '█ █ █', '█   █', '█   █'],
+                'N': ['██ █▄', '█▄██▄', '█▄█▄█', '█ ▄█▄', '█  █▄'],
+                'O': [' ███▄', '█  █▄', '█  █▄', '█  █▄', ' ███▄'],
+                'P': ['███▄▄', '█  █▄', '███▄▄', '█  ▄ ', '█  ▄ '],
+                'Q': [' ███▄', '█  █▄', '█▄██▄', '█ ▄█▄', ' ██▄█'],
+                'R': ['███▄▄', '█  █▄', '███▄▄', '█▄█▄ ', '█ ▄█▄'],
+                'S': [' ███▄', '█  ▄ ', ' ███▄', '  ▄█▄', '███▄▄'],
+                'T': ['████▄', ' █▄  ', ' █▄  ', ' █▄  ', ' █▄  '],
+                'U': ['█  █▄', '█  █▄', '█  █▄', '█  █▄', ' ███▄'],
+                'V': ['█  █▄', '█  █▄', '█  █▄', '▄██▄ ', ' ▄█▄ '],
+                'W': ['█   █', '█   █', '█▄█▄█', '█▄█▄█', '█▄▄▄█'],
+                'X': ['█  █▄', '▄██▄ ', ' ▄█▄ ', '▄██▄ ', '█  █▄'],
+                'Y': ['█  █▄', '▄██▄ ', ' ▄█▄ ', ' ▄█▄ ', ' ▄█▄ '],
+                'Z': ['████▄', '  ▄█▄', ' ▄█▄ ', '▄█▄  ', '████▄'],
+                ' ': ['     ', '     ', '     ', '     ', '     ']
+            }
+        };
+
+        // Random text samples
+        const randomTexts = [
+            'HELLO', 'WORLD', 'AWESOME', 'COOL', 'EPIC',
+            'MATRIX', 'CYBER', 'NEON', 'CODE', 'HACK',
+            'FUTURE', 'RETRO', 'PIXEL', 'GAME', 'STYLE',
+            'DESIGN', 'ART', 'ASCII', 'TEXT', 'FONT'
+        ];
+
+        // State management
+        let currentTheme = 'dark';
+        let currentFont = 'block';
+        let currentScale = 1;
+        let savedInput = '';
+        let matrixInterval;
+
+        // DOM elements
+        const inputText = document.getElementById('inputText');
+        const asciiOutput = document.getElementById('asciiOutput');
+        const fontSelect = document.getElementById('fontSelect');
+        const sizeSlider = document.getElementById('sizeSlider');
+        const sizeValue = document.getElementById('sizeValue');
+        const copyBtn = document.getElementById('copyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const exportImageBtn = document.getElementById('exportImageBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const randomBtn = document.getElementById('randomBtn');
+        const themeButtons = document.querySelectorAll('.theme-btn');
+        const body = document.body;
+        const bgColorPicker = document.getElementById('bgColorPicker');
+        const textColorPicker = document.getElementById('textColorPicker');
+
+        // Theme-specific colors
+        const themeColors = {
+            dark: '#00ff88',
+            matrix: '#00ff41',
+            cyberpunk: '#ff0080',
+            ocean: '#00d4ff',
+            sunset: '#ff6b6b',
+            neon: '#00ffff'
+        };
+
+        // Generate ASCII art
+        function generateASCII(text, font) {
+            if (!text.trim()) return 'Your ASCII art will appear here...';
+
+            const lines = text.toUpperCase().split('\n');
+            const result = [];
+
+            lines.forEach(line => {
+                const letterRows = [[], [], [], [], []];
+
+                for (let char of line) {
+                    if (!fonts[font][char]) char = ' ';
+                    const pattern = fonts[font][char];
+
+                    pattern.forEach((row, index) => {
+                        letterRows[index].push(row);
+                    });
+                }
+
+                letterRows.forEach(row => {
+                    result.push(row.join(' '));
+                });
+
+                if (lines.length > 1) result.push('');
+            });
+
+            return result.join('\n');
+        }
+
+        // Animate ASCII output with typewriter effect
+        function animateASCII(text) {
+            asciiOutput.innerHTML = '';
+            if (text === 'Your ASCII art will appear here...') {
+                asciiOutput.textContent = text;
+                return;
+            }
+
+            const chars = text.split('');
+            chars.forEach((char, index) => {
+                const span = document.createElement('span');
+                span.className = 'ascii-char';
+                span.textContent = char;
+                asciiOutput.appendChild(span);
+
+                setTimeout(() => {
+                    span.classList.add('visible');
+                }, index * 20);
+            });
+
+            asciiOutput.style.fontSize = (currentScale * 0.8) + 'rem';
+            asciiOutput.style.color = textColorPicker.value;
+        }
+
+        // Update ASCII output
+        function updateOutput() {
+            const text = inputText.value;
+            const ascii = generateASCII(text, currentFont);
+            animateASCII(ascii);
+            savedInput = text;
+        }
+
+        // Copy to clipboard with enhanced feedback
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(asciiOutput.textContent);
+                copyBtn.innerHTML = '✅ Copied!';
+                copyBtn.classList.add('success', 'copy-success');
+
+                setTimeout(() => {
+                    copyBtn.innerHTML = '📋 Copy to Clipboard';
+                    copyBtn.classList.remove('success', 'copy-success');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                const textArea = document.createElement('textarea');
+                textArea.value = asciiOutput.textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+
+                copyBtn.innerHTML = '✅ Copied!';
+                copyBtn.classList.add('success', 'copy-success');
+                setTimeout(() => {
+                    copyBtn.innerHTML = '📋 Copy to Clipboard';
+                    copyBtn.classList.remove('success', 'copy-success');
+                }, 2000);
+            }
+        }
+
+        // Download as text file
+        function downloadASCII() {
+            const text = asciiOutput.textContent;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ascii-art-${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '💾 Downloaded!';
+            downloadBtn.classList.add('success');
+            setTimeout(() => {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.classList.remove('success');
+            }, 2000);
+        }
+
+        // Export as PNG
+        function exportAsPNG() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const text = asciiOutput.textContent;
+                const fontSize = currentScale * 16; // Increased base font size for better clarity
+                const lineHeight = fontSize * 1.3; // Adjusted line height for better spacing
+                const lines = text.split('\n');
+                const charWidth = fontSize * 0.6; // Approximate character width
+                const maxWidth = Math.max(...lines.map(line => line.length)) * charWidth;
+                const padding = 40; // Increased padding for better framing
+                const scaleFactor = window.devicePixelRatio || 2; // Use device pixel ratio or default to 2x for high-DPI
+
+                // Set canvas dimensions with scaling for high-DPI
+                canvas.width = (maxWidth + padding * 2) * scaleFactor;
+                canvas.height = (lines.length * lineHeight + padding * 2) * scaleFactor;
+
+                // Scale the context to handle high-DPI rendering
+                ctx.scale(scaleFactor, scaleFactor);
+
+                // Apply background color
+                ctx.fillStyle = bgColorPicker.value;
+                ctx.fillRect(0, 0, canvas.width / scaleFactor, canvas.height / scaleFactor);
+
+                // Set font with improved rendering
+                ctx.font = `${fontSize}px Monaco, Menlo, 'Fira Code', monospace`;
+                ctx.fillStyle = textColorPicker.value;
+                ctx.textBaseline = 'top';
+
+                // Enable text anti-aliasing and high-quality rendering
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+
+                // Optional: Add text shadow for better readability
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 2;
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 1;
+
+                // Render each line with padding
+                lines.forEach((line, index) => {
+                    ctx.fillText(line, padding, padding + index * lineHeight);
+                });
+
+                // Generate and download the image
+                const url = canvas.toDataURL('image/png', 1.0); // Use maximum quality
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ascii-art-${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                // Provide user feedback
+                const originalText = exportImageBtn.innerHTML;
+                exportImageBtn.innerHTML = '🖼️ Exported!';
+                exportImageBtn.classList.add('success');
+                setTimeout(() => {
+                    exportImageBtn.innerHTML = originalText;
+                    exportImageBtn.classList.remove('success');
+                }, 2000);
+            }
+
+        // Clear all content
+        function clearAll() {
+            inputText.value = '';
+            asciiOutput.textContent = 'Your ASCII art will appear here...';
+            savedInput = '';
+
+            const originalText = clearBtn.innerHTML;
+            clearBtn.innerHTML = '🗑️ Cleared!';
+            clearBtn.classList.add('success');
+            setTimeout(() => {
+                clearBtn.innerHTML = originalText;
+                clearBtn.classList.remove('success');
+            }, 1000);
+        }
+
+        // Generate random text
+        function generateRandomText() {
+            const randomText = randomTexts[Math.floor(Math.random() * randomTexts.length)];
+            inputText.value = randomText;
+            updateOutput();
+
+            const originalText = randomBtn.innerHTML;
+            randomBtn.innerHTML = '🎲 Generated!';
+            randomBtn.classList.add('success');
+            setTimeout(() => {
+                randomBtn.innerHTML = originalText;
+                randomBtn.classList.remove('success');
+            }, 1000);
+        }
+
+        // Set theme with enhanced effects
+        function setTheme(theme) {
+            currentTheme = theme;
+
+            themeButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-theme="${theme}"]`).classList.add('active');
+
+            body.className = body.className.replace(/theme-\w+/g, '');
+            body.classList.add(`theme-${theme}`);
+
+            textColorPicker.value = themeColors[theme];
+            updateOutput();
+        }
+
+        // Initialize app
+        function init() {
+            if (savedInput) {
+                inputText.value = savedInput;
+            }
+
+            updateOutput();
+            sizeValue.textContent = currentScale.toFixed(1) + 'x';
+
+            inputText.addEventListener('input', updateOutput);
+
+            fontSelect.addEventListener('change', (e) => {
+                currentFont = e.target.value;
+                updateOutput();
+                fontSelect.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    fontSelect.style.transform = 'scale(1)';
+                }, 200);
+            });
+
+            sizeSlider.addEventListener('input', (e) => {
+                currentScale = parseFloat(e.target.value);
+                sizeValue.textContent = currentScale.toFixed(1) + 'x';
+                updateOutput();
+            });
+
+            themeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    setTheme(btn.dataset.theme);
+                    btn.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        btn.style.transform = '';
+                    }, 150);
+                });
+            });
+
+            copyBtn.addEventListener('click', copyToClipboard);
+            downloadBtn.addEventListener('click', downloadASCII);
+            exportImageBtn.addEventListener('click', exportAsPNG);
+            clearBtn.addEventListener('click', clearAll);
+            randomBtn.addEventListener('click', generateRandomText);
+
+            bgColorPicker.addEventListener('input', updateOutput);
+            textColorPicker.addEventListener('input', updateOutput);
+
+            setTheme(currentTheme);
+
+            inputText.addEventListener('input', () => {
+                savedInput = inputText.value;
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    switch (e.key) {
+                        case 'Enter':
+                            e.preventDefault();
+                            copyToClipboard();
+                            break;
+                        case 'd':
+                            e.preventDefault();
+                            downloadASCII();
+                            break;
+                        case 'e':
+                            e.preventDefault();
+                            exportAsPNG();
+                            break;
+                        case 'r':
+                            e.preventDefault();
+                            generateRandomText();
+                            break;
+                        case 'Backspace':
+                            e.preventDefault();
+                            clearAll();
+                            break;
+                    }
+                }
+
+                if (e.key >= '1' && e.key <= '6' && !e.ctrlKey && !e.metaKey && !inputText.matches(':focus')) {
+                    const themes = ['dark', 'matrix', 'cyberpunk', 'ocean', 'sunset', 'neon'];
+                    const themeIndex = parseInt(e.key) - 1;
+                    if (themes[themeIndex]) {
+                        setTheme(themes[themeIndex]);
+                    }
+                }
+            });
+
+            document.querySelectorAll('.glass-card, .control-group').forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        // Enhanced startup with loading effects
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease';
+                document.body.style.opacity = '1';
+                init();
+            }, 100);
+        });
+
+        // Konami code easter egg
+        let typed = "";
+            const triggers = {
+                "abdullah": triggerGlitch,
+                "confetti": triggerConfetti
+            };
+
+            document.addEventListener("keydown", (e) => {
+                typed += e.key.toLowerCase();
+
+                // keep only the last 8 characters (longest trigger word)
+                if (typed.length > 8) {
+                    typed = typed.slice(-8);
+                }
+
+                // check if typed string ends with a trigger word
+                for (let word in triggers) {
+                    if (typed.endsWith(word)) {
+                        triggers[word]();
+                    }
+                }
+            });
+
+            function triggerGlitch() {
+                document.body.classList.add("glitch");
+                setTimeout(() => document.body.classList.remove("glitch"), 3000);
+            }
+
+            function triggerConfetti() {
+                for (let i = 0; i < 100; i++) {
+                    let confetti = document.createElement("div");
+                    confetti.innerText = "🎉";
+                    confetti.style.position = "fixed";
+                    confetti.style.left = Math.random() * 100 + "vw";
+                    confetti.style.top = "-5vh";
+                    confetti.style.fontSize = "24px";
+                    confetti.style.animation = `fall ${2 + Math.random() * 3}s linear forwards`;
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => confetti.remove(), 5000);
+                }
+            }
+
+            // CSS styles
+            let style = document.createElement("style");
+            style.innerHTML = `
+            @keyframes glitch {
+                0% { transform: translate(0, 0); filter: hue-rotate(0deg); }
+                20% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
+                40% { transform: translate(-5px, -5px); filter: hue-rotate(180deg); }
+                60% { transform: translate(5px, 5px); filter: hue-rotate(270deg); }
+                80% { transform: translate(5px, -5px); filter: hue-rotate(360deg); }
+                100% { transform: translate(0, 0); filter: hue-rotate(0deg); }
+            }
+
+            .glitch {
+                animation: glitch 0.2s infinite;
+            }
+
+            @keyframes fall {
+                to {
+                    transform: translateY(110vh) rotate(360deg);
+                }
+            }`;
+            document.head.appendChild(style);
+            
+    </script>
+</body>
+
+</html>
